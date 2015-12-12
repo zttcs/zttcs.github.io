@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>  
+<head>  
+	<meta charset="utf-8">  
+	<title>给柱形图添加比例尺</title>  
+</head>
+  <style>
+	.axis path,
+	.axis line{
+		fill: none;
+		stroke: black;
+		shape-rendering: crispEdges;
+	}
+
+	.axis text {
+		font-family: sans-serif;
+		font-size: 11px;
+	}
+
+	.MyRect {
+		fill: steelblue;
+	}
+
+	.MyText {
+		fill: white;
+		text-anchor: middle;
+	}
+</style>
+<body>  
+
+    <script src="d3.js" charset="utf-8"></script> 
+	<script>
+	//	var parseDate = d3.time.format("%Y/%m/%d %H:%M").parse;
+		var csv = d3.dsv(",", "text/csv;charset=gb2312");  
+		csv("2013-4-1-result.csv",function(error,csvdata){       
+			var str = d3.csv.format( csvdata );  
+			var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;			
+			//console.log(str.length);  
+			//console.log(str); 
+			var dataset_x = [];		
+			var dataset_y = [];	
+			var totalbyte = [];
+			var temp = 0;			
+			for( var i=0; i<csvdata.length; i++ ){  
+				var time = csvdata[i].time;  
+				var totalbyte = csvdata[i].firstSrcTotalByte;
+              //  dataset_x.push(csvdata[i].time);
+				temp = csvdata[i].firstSrcTotalByte / 100;
+			//	dataset_y.push(temp);
+				//console.log( "time: " + time + "\n" +  "firstSrcTotalByte: " + totalbyte + "\n" );  
+				//console.log( "dataset_y: " +dataset_y + "\n" );  
+				
+			} 
+		      csvdata.forEach(function(d) {
+					d.time = parseDate(d.time);
+					d.firstSrcTotalByte = +d.firstSrcTotalByte;
+					//console.log(d.time);
+					//console.log(d.firstSrcTotalByte);
+				});
+		    var width = 1700;
+			var height = 1700;
+
+			 
+			//在 body 里添加一个 SVG 画布   
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", width)
+						.attr("height", height);
+			 
+			//画布周边的空白
+			var padding = {left:60, right:30, top:10, bottom:20};
+					
+		    var xScale=d3.time.scale()
+                              .domain(d3.extent(csvdata, function(d) { return d.time; }))
+							  .range([0,width-padding.left-padding.right]);
+	
+			//y轴的比例尺
+				var yScale=d3.scale.linear()
+						.domain(d3.extent(csvdata, function(d) { return d.firstSrcTotalByte;}))
+						.range([height-padding.top-padding.bottom,0]);
+					 
+            //定义x轴
+			var xAxis = d3.svg.axis()
+				.scale(xScale)
+				.orient("bottom")
+				.ticks(30);
+					
+			//定义y轴
+			var yAxis = d3.svg.axis()
+				.scale(yScale)
+				.orient("left")
+				.ticks(30);
+				
+			//矩形之间的空白
+			var rectPadding = 10;
+
+			//添加矩形元素
+			var rects = svg.selectAll(".MyRect")
+					.data(csvdata)
+					.enter()
+					.append("rect")
+					.attr("class","MyRect")
+					.attr("transform","translate(" + padding.left + "," + padding.top + ")")
+					.attr("x", function(d,i){
+					     
+						return xScale(d.time);
+					} )
+					.attr("y",function(d,i){
+					    return yScale(d.firstSrcTotalByte);
+					})
+					.attr("width",3)
+					.attr("height",function(d){
+					    //console.log( "XXXXXXXX: " + yScale(d) + "i______hgjshdgjsdh"+i +"\n" ); 
+				    	return height-padding.top-padding.bottom-yScale(d.firstSrcTotalByte);	
+					})
+					
+				svg.append("g")
+				   .attr("class","axis")
+				   .attr("transform","translate(" + padding.left + "," + (height - padding.bottom) + ")")
+				   .call(xAxis); 
+						
+				//添加y轴
+				svg.append("g")
+				   .attr("class","axis")
+				   .attr("transform","translate(" + padding.left + "," + padding.top + ")")
+				   .call(yAxis);
+				   
+				   
+         }); 
+	</script>  
+
+</body>  
+</html>  

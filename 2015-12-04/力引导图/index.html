@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+        <meta charset="utf-8">
+        <title>HelloWorld</title>
+  </head>
+  <style>
+
+        .linetext {
+            font-size: 12px;
+            font-family: SimSun;
+            fill:#0000ff;
+            fill-opacity:0.0;
+        }
+
+        .linetext {
+        	font-size: 12px ;
+        	font-family: SimSun;
+        	fill:#0000FF;
+        	fill-opacity:0.0;
+        }
+  </style>
+    <body>
+        <script src="d3.js" charset="utf-8"></script>
+        <script>
+          		    var width  = 700;
+          			var height = 700;
+                    var img_width  = 30;
+                    var img_height = 30;
+
+          			var svg  = d3.select("body")
+          					.append("svg")
+          					.attr("width",width)
+          					.attr("height",height)
+
+          	// 		var node  = [{ name: "桂林" }, { name: "广州" },
+          	// 					  { name: "厦门" }, { name: "杭州" },
+          	// 					  { name: "上海" }, { name: "青岛" },
+          	// 					  { name: "天津" } ];
+                    //
+          	// 		var edges = [ { source : 0 , target: 1 } , { source : 0 , target: 2 } ,
+          	// 					   { source : 0 , target: 3 } , { source : 1 , target: 4 } ,
+          	// 					   { source : 1 , target: 5 } , { source : 1 , target: 6 } ];
+
+                    d3.json("relation.json",function(error,root){
+                                if(error){
+                                    return console.console.log(error);
+                                }
+                                // console.log(root);
+
+                            var force   = d3.layout.force()
+                                                .nodes(root.nodes)
+                                                .links(root.edges)
+                                                .size([width,height])
+                                                .linkDistance(200)
+                                                .charge(-1500)//设定引力，是排斥还是吸引，默认值为-30。值为+，则相互吸引，绝对值越大吸引力越大。值为-，则相互排斥，绝对值越大排斥力越大。
+                                                .start();//相互之间的作用力
+
+                            var label_text_1 = svg.append("text")
+            								.attr("class","labeltext")
+            								.attr("x",10)
+            								.attr("y",16)
+            								.text("运动状态：开始");
+
+            			    var label_text_2 = svg.append("text")
+            								.attr("class","labeltext")
+            								.attr("x",10)
+            								.attr("y",40)
+            								.text("拖拽状态：结束");
+
+
+
+                            var svg_edges = svg.selectAll("line")
+                                            .data(root.edges)
+                                            .enter()
+                                            .append("line")
+                                            .style("stroke","#ccc")
+                                            .style("stroke-width",1)
+
+                            var edges_text = svg.selectAll(".linetext")
+                                            .data(root.edges)
+                                            .enter()
+                                            .append("text")
+                                            .attr("class","linetext")
+                                            .text(function(d){
+                                                return d.relation
+                                            });
+                            var drag  = force.drag()
+                                            .on("dragstart",function(d,i){
+                                                d.fixed = true;  //拖拽开始后设定被拖拽对象为固定
+                                                label_text_2.text("拖拽状态：开始");
+                                            })
+                                            .on("dragend",function(d,i){
+                                                label_text_2.text("拖拽状态：结束");
+                                            })
+                                            .on("drag",function(d,i){
+                                                label_text_2.text("拖拽状态：进行中");
+                                            });
+
+
+                            var nodes_img  = svg.selectAll("image")
+                                                .data(root.nodes)
+                                                .enter()
+                                                .append("image")
+                                                .attr("width",img_width)
+                                                .attr("height",img_height)
+                                                .attr("xlink:href",function(d){
+                                                    return d.image;
+                                                })
+                                                .on("mouseover",function(d,i){
+                                                    d.show = true;
+                                                })
+                                                .on("mouseout",function(d,i){
+                                                    d.show = false;
+                                                })
+                                                .call(drag);
+                            nodes_img.on("dblclick",function(d,i){
+                                                        d.fixed = false;
+                                                    })
+                            var text_dx  = -20;
+                            var text_dy  = 20;
+
+                            var nodes_text  = svg.selectAll(".nodetext")
+                                            .data(root.nodes)
+                                            .enter()
+                                            .append("text")
+                                            .attr("class","nodetext")
+                                            .text(function(d){
+                                                return d.name;
+                                            });
+
+
+                            force.on("start",function(){
+                                label_text_1.text("运动状态：开始");
+                            });
+                            force.on("end",function(){
+                                label_text_1.text("运动状态：结束");
+                            });
+                            force.on("tick",function(){
+                                //限制结点的边界
+                                label_text_1.text("运动状态：进行中");
+                                root.nodes.forEach(function(d,i){
+                                      d.x = d.x - img_width/2 < 0     ? img_width/2 : d.x ;
+                                      d.x = d.x + img_width/2 > width ? width - img_width/2 : d.x ;
+                                      d.y = d.y - img_height/2 < 0      ? img_height/2 : d.y ;
+                                      d.y = d.y + img_height/2 + text_dy > height ? height - img_height/2 - text_dy : d.y ;
+                                  });
+                                 //更新连接线的位置
+                                 svg_edges.attr("x1",function(d){ return d.source.x; });
+                                 svg_edges.attr("y1",function(d){ return d.source.y; });
+                                 svg_edges.attr("x2",function(d){ return d.target.x; });
+                                 svg_edges.attr("y2",function(d){ return d.target.y; });
+
+                                 //跟新连接线上的文字
+                                 edges_text.attr("x",function(d){return (d.source.x + d.target.x)/2;});
+                                 edges_text.attr("y",function(d){return (d.source.y + d.target.y)/2;});
+
+                                 //是否绘制连接线上的文字
+                                 edges_text.style("fill-opacity",function(d){
+                                    return d.source.show || d.target.show ? 1.0 : 0.0 ;
+                                 });
+
+                                 //更新结点图片和文字
+                                 nodes_img.attr("x",function(d){ return d.x - img_width/2; });
+                                 nodes_img.attr("y",function(d){ return d.y - img_height/2; });
+
+                                 nodes_text.attr("x",function(d){ return d.x+ img_width/2; });
+                                 nodes_text.attr("y",function(d){ return d.y + img_height/2; });
+                        });
+                });
+
+
+          // 			var forces = d3.layout.force() //力引导图用到的布局
+          // 						.nodes(node)
+          // 						.links(edges)
+          // 						.size([width,height])
+          // 						.linkDistance(150)
+          // 						.charge([-400])   //相互之间的作用力
+                //
+          // 			forces.start();//开始作用
+                //
+          // 			var svg_edges = svg.selectAll("line")
+          // 							.data(edges)
+          // 							.enter()
+          // 							.append("line")
+          // 							.style("stroke","#ccc")
+          // 							.style("stroke-width",1)
+                //
+          // 			var color = d3.scale.category20();
+                //
+          // 			var svg_nodes = svg.selectAll("circle")
+          // 							.data(node)
+          // 							.enter()
+          // 							.append("circle")
+                //                     .attr("r",20)
+          // 							.style("fill",function(d,i){
+          // 									return color(i)
+          // 							})
+          // 							.call(forces.drag);
+                //
+          // 			var svg_text  = svg.selectAll("text")
+          // 							.data(node)
+          // 							.enter()
+          // 							.append("text")
+          // 							.style("fill","black")
+          // 							.attr("dx",20)
+                //                     .attr("dy",8)
+                //                     .text(function(d){
+                //                           return d.name;
+                //                     });
+                // //拖拽后移动的位置坐标
+                //    forces.on("tick",function(){
+                //         svg_edges.attr("x1",function(d){return d.source.x;})
+                //               .attr("y1",function(d){return d.source.y;})
+                //               .attr("x2",function(d){return d.target.x;})
+                //               .attr("y2",function(d){return d.target.y;});
+                //
+                //         svg_nodes.attr("cx",function(d){return d.x;})
+                //                   .attr("cy",function(d){return d.y;});
+                //         //更新文字
+                //         svg_text.attr("x",function(d){return d.x;})
+                //                 .attr("y",function(d){return d.y;});
+                //     }
+                // );
+        </script>
+    </body>
+</html>
