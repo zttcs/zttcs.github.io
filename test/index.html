@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>  
-<head>  
-	<meta charset="utf-8">  
-	<title>¸øÖùĞÎÍ¼Ìí¼Ó±ÈÀı³ß</title>  
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>æµé‡ç›´æ–¹å›¾æµ‹è¯•</title>
 </head>
   <style>
 	.axis path,
@@ -26,31 +26,31 @@
 		text-anchor: middle;
 	}
 </style>
-<body>  
+<body>
 
-    <script src="d3.js" charset="utf-8"></script> 
+    <script src="d3.js" charset="utf-8"></script>
 	<script>
 	//	var parseDate = d3.time.format("%Y/%m/%d %H:%M").parse;
-		var csv = d3.dsv(",", "text/csv;charset=gb2312");  
-		csv("2013-4-1-result.csv",function(error,csvdata){       
-			var str = d3.csv.format( csvdata );  
-			var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;			
-			//console.log(str.length);  
-			//console.log(str); 
-			var dataset_x = [];		
-			var dataset_y = [];	
+		var csv = d3.dsv(",", "text/csv;charset=UTF-8");
+		csv("2013-4-1-result.csv",function(error,csvdata){
+			var str = d3.csv.format( csvdata );
+			var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
+			//console.log(str.length);
+			//console.log(str);
+			var dataset_x = [];
+			var dataset_y = [];
 			var totalbyte = [];
-			var temp = 0;			
-			for( var i=0; i<csvdata.length; i++ ){  
-				var time = csvdata[i].time;  
+			var temp = 0;
+			for( var i=0; i<csvdata.length; i++ ){
+				var time = csvdata[i].time;
 				var totalbyte = csvdata[i].firstSrcTotalByte;
               //  dataset_x.push(csvdata[i].time);
 				temp = csvdata[i].firstSrcTotalByte / 100;
 			//	dataset_y.push(temp);
-				//console.log( "time: " + time + "\n" +  "firstSrcTotalByte: " + totalbyte + "\n" );  
-				//console.log( "dataset_y: " +dataset_y + "\n" );  
-				
-			} 
+				//console.log( "time: " + time + "\n" +  "firstSrcTotalByte: " + totalbyte + "\n" );
+				//console.log( "dataset_y: " +dataset_y + "\n" );
+
+			}
 		      csvdata.forEach(function(d) {
 					d.time = parseDate(d.time);
 					d.firstSrcTotalByte = +d.firstSrcTotalByte;
@@ -60,41 +60,36 @@
 		    var width = 1700;
 			var height = 1700;
 
-			 
-			//ÔÚ body ÀïÌí¼ÓÒ»¸ö SVG »­²¼   
+
+
 			var svg = d3.select("body")
 						.append("svg")
 						.attr("width", width)
 						.attr("height", height);
-			 
-			//»­²¼ÖÜ±ßµÄ¿Õ°×
+
+
 			var padding = {left:60, right:30, top:10, bottom:20};
-					
+
 		    var xScale=d3.time.scale()
                               .domain(d3.extent(csvdata, function(d) { return d.time; }))
 							  .range([0,width-padding.left-padding.right]);
-	
-			//yÖáµÄ±ÈÀı³ß
-				var yScale=d3.scale.linear()
+
+			var yScale=d3.scale.linear()
 						.domain(d3.extent(csvdata, function(d) { return d.firstSrcTotalByte;}))
 						.range([height-padding.top-padding.bottom,0]);
-					 
-            //¶¨ÒåxÖá
+
 			var xAxis = d3.svg.axis()
 				.scale(xScale)
 				.orient("bottom")
 				.ticks(30);
-					
-			//¶¨ÒåyÖá
+
 			var yAxis = d3.svg.axis()
 				.scale(yScale)
 				.orient("left")
 				.ticks(30);
-				
-			//¾ØĞÎÖ®¼äµÄ¿Õ°×
+
 			var rectPadding = 10;
 
-			//Ìí¼Ó¾ØĞÎÔªËØ
 			var rects = svg.selectAll(".MyRect")
 					.data(csvdata)
 					.enter()
@@ -102,7 +97,7 @@
 					.attr("class","MyRect")
 					.attr("transform","translate(" + padding.left + "," + padding.top + ")")
 					.attr("x", function(d,i){
-					     
+
 						return xScale(d.time);
 					} )
 					.attr("y",function(d,i){
@@ -110,24 +105,23 @@
 					})
 					.attr("width",3)
 					.attr("height",function(d){
-					    //console.log( "XXXXXXXX: " + yScale(d) + "i______hgjshdgjsdh"+i +"\n" ); 
-				    	return height-padding.top-padding.bottom-yScale(d.firstSrcTotalByte);	
+					    //console.log( "XXXXXXXX: " + yScale(d) + "i______hgjshdgjsdh"+i +"\n" );
+				    	return height-padding.top-padding.bottom-yScale(d.firstSrcTotalByte);
 					})
-					
+
 				svg.append("g")
 				   .attr("class","axis")
 				   .attr("transform","translate(" + padding.left + "," + (height - padding.bottom) + ")")
-				   .call(xAxis); 
-						
-				//Ìí¼ÓyÖá
+				   .call(xAxis);
+
 				svg.append("g")
 				   .attr("class","axis")
 				   .attr("transform","translate(" + padding.left + "," + padding.top + ")")
 				   .call(yAxis);
-				   
-				   
-         }); 
-	</script>  
 
-</body>  
-</html>  
+
+         });
+	</script>
+
+</body>
+</html>

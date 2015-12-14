@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>  
-<head>  
-	<meta charset="utf-8">  
-	<title>¸øÖùĞÎÍ¼Ìí¼Ó±ÈÀı³ß</title>  
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>æµé‡ç›´æ–¹å›¾æµ‹è¯•index_UnixTime</title>  
 </head>
   <style>
 	.axis path,
@@ -26,71 +26,71 @@
 		text-anchor: middle;
 	}
 </style>
-<body>  
+<body>
 
-    <script src="d3.js" charset="utf-8"></script> 
+    <script src="d3.js" charset="utf-8"></script>
 	<script>
 	//	var parseDate = d3.time.format("%Y/%m/%d %H:%M").parse;
-		var csv = d3.dsv(",", "text/csv;charset=gb2312");  
-		csv("316.csv",function(error,csvdata){       
-			var str = d3.csv.format( csvdata );  
-			var parseDate = d3.time.format("%Y/%m/%d %H:%M").parse;			
-			//console.log(str.length);  
-			//console.log(str); 
-			var dataset_x = [];		
-			var dataset_y = [];	
+		var csv = d3.dsv(",", "text/csv;charset=gb2312");
+		csv("316.csv",function(error,csvdata){
+			var str = d3.csv.format( csvdata );
+			var parseDate = d3.time.format("%Y/%m/%d %H:%M").parse;
+			//console.log(str.length);
+			//console.log(str);
+			var dataset_x = [];
+			var dataset_y = [];
 			var totalbyte = [];
-			var temp = 0;			
-			for( var i=0; i<csvdata.length; i++ ){  
-				var time = csvdata[i].time;  
+			var temp = 0;
+			for( var i=0; i<csvdata.length; i++ ){
+				var time = csvdata[i].time;
 				var totalbyte = csvdata[i].firstSrcTotalByte;
                 dataset_x.push(csvdata[i].time);
 				temp = csvdata[i].firstSrcTotalByte / 100;
 				dataset_y.push(temp);
-				console.log( "time: " + time + "\n" +  
-									 "firstSrcTotalByte: " + totalbyte + "\n" );  
-				//console.log( "dataset_y: " +dataset_y + "\n" );  
-			} 
-		 
+				console.log( "time: " + time + "\n" +
+									 "firstSrcTotalByte: " + totalbyte + "\n" );
+				//console.log( "dataset_y: " +dataset_y + "\n" );
+			}
+
 		    var width = 1700;
 			var height = 1700;
 
-			 
-			//ÔÚ body ÀïÌí¼ÓÒ»¸ö SVG »­²¼   
+
+			//ï¿½ï¿½ body ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ SVG ï¿½ï¿½ï¿½ï¿½
 			var svg = d3.select("body")
 						.append("svg")
 						.attr("width", width)
 						.attr("height", height);
-			 
-			//»­²¼ÖÜ±ßµÄ¿Õ°×
+
+			//ï¿½ï¿½ï¿½ï¿½ï¿½Ü±ßµÄ¿Õ°ï¿½
 			var padding = {left:60, right:30, top:10, bottom:20};
-					
+
 		    var xScale = d3.scale.linear()
 						         .domain(d3.extent(dataset_x))
 					             .range([0,width-padding.left-padding.right]);
-			 
-			//yÖáµÄ±ÈÀı³ß
+
+			//yï¿½ï¿½ï¿½Ä±ï¿½ï¿½ï¿½ï¿½ï¿½
 			var yScale = d3.scale.linear()
 					             .domain(d3.extent(dataset_y))
 								 .range([height - padding.top - padding.bottom, 0]);
-								
-					 
-            //¶¨ÒåxÖá
+
+
+            //ï¿½ï¿½ï¿½ï¿½xï¿½ï¿½
 			var xAxis = d3.svg.axis()
 				.scale(xScale)
 				.orient("bottom")
 				.ticks(30);
-					
-			//¶¨ÒåyÖá
+
+			//ï¿½ï¿½ï¿½ï¿½yï¿½ï¿½
 			var yAxis = d3.svg.axis()
 				.scale(yScale)
 				.orient("left")
 				.ticks(30);
-				
-			//¾ØĞÎÖ®¼äµÄ¿Õ°×
+
+			//ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½ï¿½Ä¿Õ°ï¿½
 			var rectPadding = 10;
 
-			//Ìí¼Ó¾ØĞÎÔªËØ
+			//ï¿½ï¿½ï¿½Ó¾ï¿½ï¿½ï¿½Ôªï¿½ï¿½
 			var rects = svg.selectAll(".MyRect")
 					.data(dataset_y)
 					.enter()
@@ -98,7 +98,7 @@
 					.attr("class","MyRect")
 					.attr("transform","translate(" + padding.left + "," + padding.top + ")")
 					.attr("x", function(d,i){
-					     
+
 						return xScale(i+1364992986);
 					} )
 					.attr("y",function(d,i){
@@ -106,24 +106,24 @@
 					})
 					.attr("width",3)
 					.attr("height",function(d){
-					    console.log( "XXXXXXXX: " + yScale(d) + "i______hgjshdgjsdh"+i +"\n" ); 
-				    	return height-padding.top-padding.bottom-yScale(d);	
+					    console.log( "XXXXXXXX: " + yScale(d) + "i______hgjshdgjsdh"+i +"\n" );
+				    	return height-padding.top-padding.bottom-yScale(d);
 					})
-					
+
 				svg.append("g")
 				   .attr("class","axis")
 				   .attr("transform","translate(" + padding.left + "," + (height - padding.bottom) + ")")
-				   .call(xAxis); 
-						
-				//Ìí¼ÓyÖá
+				   .call(xAxis);
+
+				//ï¿½ï¿½ï¿½ï¿½yï¿½ï¿½
 				svg.append("g")
 				   .attr("class","axis")
 				   .attr("transform","translate(" + padding.left + "," + padding.top + ")")
 				   .call(yAxis);
-				   
-				   
-         }); 
-	</script>  
 
-</body>  
-</html>  
+
+         });
+	</script>
+
+</body>
+</html>
